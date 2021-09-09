@@ -1,0 +1,498 @@
+//Notes// 
+//Use arrow keys to pull previous commands//
+//Cursor is one past character//
+//Can input data in CSV's//
+//When given arrows and not returned to mysql>, type ; and hit enter//
+//* is unspecified. Pulls all data//
+//Reusable Queries are usually entered into Script Files typically//
+
+//Select Database to Return to Tables//
+
+//Homework Notes//
+//Anything that doesn't have foreign key first//
+//Aggregation coming next class//
+
+//Side Notes//
+//Oracle SQL Server Relational Database okay to use//
+
+
+
+//Show your Databases//
+
+mysql> show databases;
+
+//Create a Database// 
+
+mysql> create database test;
+Query OK, 1 row affected (0.00 sec)
+
+//Use a Database//
+
+mysql> use test;
+Database changed
+
+//Create a Table//
+
+mysql> create table customer(id INT, f_name VARCHAR(20),l_name VARCHAR(20), email VARCHAR(25), phone INT, company VARCHAR(30), primary key(id));
+Query OK, 0 rows affected (0.05 sec)
+
+//Side Note: Use "Big Int" for full phone numbers//
+
+//Show Tables//
+
+mysql> show tables;
+
+//Show your Table's Columns - 
+
+mysql> describe customer;
+
+//Create a Table with a Foreign Key//
+
+mysql> create table orders(id int, c_id int, p_id int, date varchar(20), qty int, shipping varchar(10), sales int, primary key(id), foreign key(c_id) references customer(id));
+Query OK, 0 rows affected (0.05 sec)
+
+//Insert Data into Tables//
+
+mysql> insert into customer values(1, "John", "Smith", "js@abc.com", 6957871, "abc");
+Query OK, 1 row affected (0.00 sec)
+
+mysql> insert into orders values(1, 1, 53, "5-21-16", 5, "ground", 100);
+Query OK, 1 row affected (0.02 sec)
+
+//Select Data from one Table//
+
+mysql> select f_name, l_name, email from customer;
++--------+----------+------------+
+| f_name | l_name   | email      |
++--------+----------+------------+
+| John   | Smith    | js@abc.com |
+| Jane   | Doe      | jd@abc.com |
+| Mike   | Thompson | mt@ubi.com |
++--------+----------+------------+
+3 rows in set (0.00 sec)
+
+ysql> select company from customer;
++---------+
+| company |
++---------+
+| abc     |
+| abc     |
+| ubi     |
++---------+
+3 rows in set (0.00 sec)
+
+mysql> select sales from orders;
++-------+
+| sales |
++-------+
+|   100 |
+|   500 |
+|    13 |
+|    54 |
++-------+
+4 rows in set (0.00 sec)
+
+//Using the Select-From-Where Statement//
+
+//Side Note: <> is the Not Operator// 
+
+mysql> select email, company from customer where id >=2;
++------------+---------+
+| email      | company |
++------------+---------+
+| jd@abc.com | abc     |
+| mt@ubi.com | ubi     |
++------------+---------+
+2 rows in set (0.00 sec)
+
+//To check, pull all data//
+
+mysql> select * from customer;
++----+--------+----------+------------+---------+---------+
+| id | f_name | l_name   | email      | phone   | company |
++----+--------+----------+------------+---------+---------+
+|  1 | John   | Smith    | js@abc.com | 6957871 | abc     |
+|  2 | Jane   | Doe      | jd@abc.com | 6957872 | abc     |
+|  3 | Mike   | Thompson | mt@ubi.com | 6957873 | ubi     |
++----+--------+----------+------------+---------+---------+
+3 rows in set (0.00 sec)
+
+//Query with no results//
+
+mysql> select email, company from customer where id >=10;
+Empty set (0.00 sec)
+
+//Query with more particular requirements//
+
+mysql> select * from orders where p_id = 53;
++----+------+------+---------+------+----------+-------+
+| id | c_id | p_id | date    | qty  | shipping | sales |
++----+------+------+---------+------+----------+-------+
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |
+|  3 |    2 |   53 | 5-3-15  |    1 | ground   |    13 |
++----+------+------+---------+------+----------+-------+
+2 rows in set (0.00 sec)
+
+// And Statement//
+
+mysql> select * from orders where p_id = 53 and qty >=2;
++----+------+------+---------+------+----------+-------+
+| id | c_id | p_id | date    | qty  | shipping | sales |
++----+------+------+---------+------+----------+-------+
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |
++----+------+------+---------+------+----------+-------+
+1 row in set (0.00 sec)
+
+//Or Statement//
+
+mysql> select * from orders where p_id = 53 or qty >=2;
++----+------+------+---------+------+----------+-------+
+| id | c_id | p_id | date    | qty  | shipping | sales |
++----+------+------+---------+------+----------+-------+
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |
+|  3 |    2 |   53 | 5-3-15  |    1 | ground   |    13 |
++----+------+------+---------+------+----------+-------+
+2 rows in set (0.00 sec)
+
+mysql> select date, shipping from orders where c_id = 1 or sales >=10;
++---------+----------+
+| date    | shipping |
++---------+----------+
+| 5-21-16 | ground   |
+| 7-14-16 | air      |
+| 5-3-15  | ground   |
+| 5-30-16 | ground   |
++---------+----------+
+4 rows in set (0.00 sec)
+
+mysql> select id, c_id, p_id, qty from orders where p_id = 53 and qty >=2;
++----+------+------+------+
+| id | c_id | p_id | qty  |
++----+------+------+------+
+|  1 |    1 |   53 |    5 |
++----+------+------+------+
+1 row in set (0.00 sec)
+
+//Or with *//
+
+mysql> select * from orders where p_id = 53 and qty >=2;
++----+------+------+---------+------+----------+-------+
+| id | c_id | p_id | date    | qty  | shipping | sales |
++----+------+------+---------+------+----------+-------+
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |
++----+------+------+---------+------+----------+-------+
+1 row in set (0.00 sec)
+
+//Queries from Multiple Tables (Incorrectly)//
+
+mysql> select * from orders, customer where p_id = 53 and qty >=2;
++----+------+------+---------+------+----------+-------+----+--------+----------+------------+---------+---------+
+| id | c_id | p_id | date    | qty  | shipping | sales | id | f_name | l_name   | email      | phone   | company |
++----+------+------+---------+------+----------+-------+----+--------+----------+------------+---------+---------+
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |  1 | John   | Smith    | js@abc.com | 6957871 | abc     |
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |  2 | Jane   | Doe      | jd@abc.com | 6957872 | abc     |
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |  3 | Mike   | Thompson | mt@ubi.com | 6957873 | ubi     |
++----+------+------+---------+------+----------+-------+----+--------+----------+------------+---------+---------+
+3 rows in set (0.00 sec)
+
+//Side Note: Cartisian Product. All possible combinations with filter defined by query. Where all data that is being compared to main table is also displayed//
+
+//Full Cartisian Product. All possible combinations//
+
+mysql> select * from orders, customer;
++----+------+------+---------+------+----------+-------+----+--------+----------+------------+---------+---------+
+| id | c_id | p_id | date    | qty  | shipping | sales | id | f_name | l_name   | email      | phone   | company |
++----+------+------+---------+------+----------+-------+----+--------+----------+------------+---------+---------+
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |  1 | John   | Smith    | js@abc.com | 6957871 | abc     |
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |  2 | Jane   | Doe      | jd@abc.com | 6957872 | abc     |
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |  3 | Mike   | Thompson | mt@ubi.com | 6957873 | ubi     |
+|  2 |    1 |   12 | 7-14-16 |    1 | air      |   500 |  1 | John   | Smith    | js@abc.com | 6957871 | abc     |
+|  2 |    1 |   12 | 7-14-16 |    1 | air      |   500 |  2 | Jane   | Doe      | jd@abc.com | 6957872 | abc     |
+|  2 |    1 |   12 | 7-14-16 |    1 | air      |   500 |  3 | Mike   | Thompson | mt@ubi.com | 6957873 | ubi     |
+|  3 |    2 |   53 | 5-3-15  |    1 | ground   |    13 |  1 | John   | Smith    | js@abc.com | 6957871 | abc     |
+|  3 |    2 |   53 | 5-3-15  |    1 | ground   |    13 |  2 | Jane   | Doe      | jd@abc.com | 6957872 | abc     |
+|  3 |    2 |   53 | 5-3-15  |    1 | ground   |    13 |  3 | Mike   | Thompson | mt@ubi.com | 6957873 | ubi     |
+|  4 |    3 |    4 | 5-30-16 |    1 | ground   |    54 |  1 | John   | Smith    | js@abc.com | 6957871 | abc     |
+|  4 |    3 |    4 | 5-30-16 |    1 | ground   |    54 |  2 | Jane   | Doe      | jd@abc.com | 6957872 | abc     |
+|  4 |    3 |    4 | 5-30-16 |    1 | ground   |    54 |  3 | Mike   | Thompson | mt@ubi.com | 6957873 | ubi     |
++----+------+------+---------+------+----------+-------+----+--------+----------+------------+---------+---------+
+12 rows in set (0.00 sec)
+
+//Queries from Multiple Tables (Correctly)//
+
+mysql> select * from orders, customer where p_id = 53 and qty >=2 and orders.c_id = customer.id;
++----+------+------+---------+------+----------+-------+----+--------+--------+------------+---------+---------+
+| id | c_id | p_id | date    | qty  | shipping | sales | id | f_name | l_name | email      | phone   | company |
++----+------+------+---------+------+----------+-------+----+--------+--------+------------+---------+---------+
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |  1 | John   | Smith  | js@abc.com | 6957871 | abc     |
++----+------+------+---------+------+----------+-------+----+--------+--------+------------+---------+---------+
+1 row in set (0.00 sec)
+
+mysql> select f_name, l_name, phone from orders, customer where sales > 75 and orders.c_id = customer.id;
++--------+--------+---------+
+| f_name | l_name | phone   |
++--------+--------+---------+
+| John   | Smith  | 6957871 |
+| John   | Smith  | 6957871 |
++--------+--------+---------+
+2 rows in set (0.00 sec)
+
+//Running into Ambiguous Erros?//
+
+mysql> select * from customer, orders where id = c_id;
+ERROR 1052 (23000): Column 'id' in where clause is ambiguous
+
+//Solution is Adding Table Names or Aliasing//
+
+//Side Note: Aliasing statement example: Table Employee as E; Only lasts for current Query//
+
+// To remove Duplicate Tuples - Use "Distinct"//
+
+mysql> select c_id from orders where p_id = 53 or p_id = 12;
++------+
+| c_id |
++------+
+|    1 |
+|    1 |
+|    2 |
++------+
+3 rows in set (0.00 sec)
+
+mysql> select distinct c_id from orders where p_id = 53 or p_id = 12;
++------+
+| c_id |
++------+
+|    1 |
+|    2 |
++------+
+2 rows in set (0.00 sec)
+
+//Set Operations: Union - All Data, Intersect - Overlap, Except - 1st Table Minus 2nd and Overlap//
+
+mysql> select c_id from orders where p_id = 53;
++------+
+| c_id |
++------+
+|    1 |
+|    2 |
++------+
+2 rows in set (0.00 sec)
+
+mysql> select c_id from orders where p_id = 12;
++------+
+| c_id |
++------+
+|    1 |
++------+
+1 row in set (0.00 sec)
+
+mysql> select c_id from orders where p_id = 53
+    -> Union
+    -> select c_id from orders where p_id = 12;
++------+
+| c_id |
++------+
+|    1 |
+|    2 |
++------+
+2 rows in set (0.02 sec)
+
+//Like Comparison Operator, Pattern Matching Strings or Matching Character Patterns//
+
+//Who all in class has a name that start with a D?//
+
+//= is an Exact Comparison, % replaces arbitrary number of characters//
+
+//Example: WHERE Addres LIKE '%Houston,TX&';//
+
+//Example: Where Ssn LIKE '__1__8901'//
+
+//Example//
+
+mysql> select * from customer;
++----+--------+----------+------------+---------+---------+
+| id | f_name | l_name   | email      | phone   | company |
++----+--------+----------+------------+---------+---------+
+|  1 | John   | Smith    | js@abc.com | 6957871 | abc     |
+|  2 | Jane   | Doe      | jd@abc.com | 6957872 | abc     |
+|  3 | Mike   | Thompson | mt@ubi.com | 6957873 | ubi     |
++----+--------+----------+------------+---------+---------+
+3 rows in set (0.00 sec)
+
+mysql> select * from customer where f_name like 'j%';
++----+--------+--------+------------+---------+---------+
+| id | f_name | l_name | email      | phone   | company |
++----+--------+--------+------------+---------+---------+
+|  1 | John   | Smith  | js@abc.com | 6957871 | abc     |
+|  2 | Jane   | Doe    | jd@abc.com | 6957872 | abc     |
++----+--------+--------+------------+---------+---------+
+2 rows in set (0.00 sec)
+
+//Bulk Upload//
+
+mysql> load data infile "" into table (Google it)
+
+//Delete Table//
+
+mysql> drop table ""
+
+//Aggregate Operator//
+
+
+
+// Question 8: Condition in one table, sum in another//
+
+
+
+//Class Exercise//
+
+mysql> select * from orders;
++----+------+------+---------+------+----------+-------+
+| id | c_id | p_id | date    | qty  | shipping | sales |
++----+------+------+---------+------+----------+-------+
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |
+|  2 |    1 |   12 | 7-14-16 |    1 | air      |   500 |
+|  3 |    2 |   53 | 5-3-15  |    1 | ground   |    13 |
+|  4 |    3 |    4 | 5-30-16 |    1 | ground   |    54 |
++----+------+------+---------+------+----------+-------+
+4 rows in set (0.00 sec)
+
+mysql> select sales from orders;
++-------+
+| sales |
++-------+
+|   100 |
+|   500 |
+|    13 |
+|    54 |
++-------+
+4 rows in set (0.00 sec)
+
+mysql> select * from orders order by sales;
++----+------+------+---------+------+----------+-------+
+| id | c_id | p_id | date    | qty  | shipping | sales |
++----+------+------+---------+------+----------+-------+
+|  3 |    2 |   53 | 5-3-15  |    1 | ground   |    13 |
+|  4 |    3 |    4 | 5-30-16 |    1 | ground   |    54 |
+|  1 |    1 |   53 | 5-21-16 |    5 | ground   |   100 |
+|  2 |    1 |   12 | 7-14-16 |    1 | air      |   500 |
++----+------+------+---------+------+----------+-------+
+4 rows in set (0.00 sec)
+
+mysql> select max(sales) from orders;
++------------+
+| max(sales) |
++------------+
+|        500 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select avg(sales), max(sales), min(sales) from orders;
++------------+------------+------------+
+| avg(sales) | max(sales) | min(sales) |
++------------+------------+------------+
+|   166.7500 |        500 |         13 |
++------------+------------+------------+
+1 row in set (0.00 sec)
+
+mysql> select avg(sales) as AVERAGE_SALES, max(sales) as MAX_SALES, min(sales)as MIN_SALES from orders;
++---------------+-----------+-----------+
+| AVERAGE_SALES | MAX_SALES | MIN_SALES |
++---------------+-----------+-----------+
+|      166.7500 |       500 |        13 |
++---------------+-----------+-----------+
+1 row in set (0.00 sec)
+
+mysql> select sales*1.1 as PROJECTED_SALES from orders;
++-----------------+
+| PROJECTED_SALES |
++-----------------+
+|           110.0 |
+|           550.0 |
+|            14.3 |
+|            59.4 |
++-----------------+
+4 rows in set (0.00 sec)
+
+mysql> select max(sales) from customer, orders where customer.id = orders.c_id and company = 'abc';
++------------+
+| max(sales) |
++------------+
+|        500 |
++------------+
+1 row in set (0.00 sec
+
+//Group by Clause//
+
+
+
+//Question 6 and 7: //
+
+Department Table count(*)
+
+mysql> select count(*) from orders;
++----------+
+| count(*) |
++----------+
+|        4 |
++----------+
+1 row in set (0.00 sec)
+
+Each entry in Shoe Table is type, combine Department ID, count 
+
+//Class Exercise//
+
+ysql> select c_id, count(*), avg(sales) from orders group by c_id;
++------+----------+------------+
+| c_id | count(*) | avg(sales) |
++------+----------+------------+
+|    1 |        2 |   300.0000 |
+|    2 |        1 |    13.0000 |
+|    3 |        1 |    54.0000 |
++------+----------+------------+
+3 rows in set (0.00 sec)
+
+mysql> select c_id, count(*) as NUM_ORDERS, avg(sales) as AVG_SALES from orders group by c_id;
++------+------------+-----------+
+| c_id | NUM_ORDERS | AVG_SALES |
++------+------------+-----------+
+|    1 |          2 |  300.0000 |
+|    2 |          1 |   13.0000 |
+|    3 |          1 |   54.0000 |
++------+------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> select c_id, count(*) as NUM_ORDERS, avg(sales) as AVG_SALES from orders group by c_id order by AVG_SALES desc;
++------+------------+-----------+
+| c_id | NUM_ORDERS | AVG_SALES |
++------+------------+-----------+
+|    1 |          2 |  300.0000 |
+|    3 |          1 |   54.0000 |
+|    2 |          1 |   13.0000 |
++------+------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> select c_id, count(*) as NUM_ORDERS, avg(sales) as AVG_SALES from orders group by c_id order by AVG_SALES desc limit 2;
++------+------------+-----------+
+| c_id | NUM_ORDERS | AVG_SALES |
++------+------------+-----------+
+|    1 |          2 |  300.0000 |
+|    3 |          1 |   54.0000 |
++------+------------+-----------+
+2 rows in set (0.00 sec)
+
+//Still show data if there is no match//
+
+select (columns) left outer join (
+
+//Don't show anything if there is no match//
+
+select
+
+learn joins!
+
+//Diagram//
+
+		Outer
+Left	Inner	Right
+
